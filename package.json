@@ -2,10 +2,14 @@
   "name": "slack-archive-viewer-builder",
   "version": "1.0.0",
   "description": "",
-  "main": "build.js",
+  "main": "build.mjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node build.mjs"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "http-server": "^14.1.1",
+    "open": "^10.1.0"
+  }
 }
