@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src = 'urlParams.js'></script>
+        <script>
+            function setTitle(str) {
+                document.title = `Slack | ${str}`;
+            }
+
+            function getURLParameters() {
+                const result = {};
+                
+                const paramStr = window.location.search.substring(1);
+                const pairs = paramStr.split('&');
+                
+                if (paramStr.length > 0) {
+                    for (const i of pairs) {
+                        let seperated = i.split('=');
+                        result[seperated[0]] = seperated[1];
+                    }        
+                }
+
+                return result;
+            }
+
+            function getDate(slackTS) {
+                return new Date(parseFloat(slackTS) * 1000);
+            }
+
+            function getDateString(date) {
+                let hours = date.getHours();
+                let minutes = date.getMinutes(); 
+                let seconds = date.getSeconds();
+                return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+
+            function getPrettyName(member) {
+                if (member.profile && member.profile['display_name'].length > 0)
+                    return member.profile['display_name'];
+                else 
+                    return member['real_name'];
+            }
+
+            function getMessagesInSpan(messages, start, end) {
+                const result = [];
+                
+                for (const i of messages) {
+                    if (i.ts && i.ts < (end / 1000) && i.ts >= (start / 1000)) {
+                        result.push(i);
+                    }
+                }
+
+                return result;
+                
+            }
+        
+            function setDisplay(ID, value) {
+                document.getElementById(ID).style.display = value;
+            }
+
+            function toggleCollapse(t) {
+                let contentID = t.id.split('Title').join('Content');
+                let titleMaxID = t.id + 'Max';
+                let titleMinID = t.id + 'Min';
+
+                if (document.getElementById(contentID).style.display === 'none') {
+                    setDisplay(contentID, 'block');
+                    setDisplay(titleMaxID, 'block');
+                    setDisplay(titleMinID, 'none');
+                } else {
+                    setDisplay(contentID, 'none');
+                    setDisplay(titleMaxID, 'none');
+                    setDisplay(titleMinID, 'block');
+                }
+            }
+
+        </script>
+        <script async type = "module">
+            const { jml, jml_nester } = await import('./jml.mjs');
+            const { dateWidgetUI } = await import('./dateWidget.mjs')
+            const { memberWidgetUI } = await import('memberWidget.mjs')
+
+            let params = getURLParameters();
+            
+            if (!params.type || !params.id) {
+                console.log('Missing parameters'); 
+            } else {
+                let dir = `./VIEWERDATA/${params.type}/${params.id}`;
+                console.log(dir);
+
+                init(dir);
+            }
+
+            async function init(dir) {
+                // const { info, members, messages, threads } = await import(...
+                // FETCH CHANNEL DATA into info(), members(), messages(), threads()
+
+                if (info()['is_im'] && info().user) {
+                    let mem = members().find(member => member.id === info().user);
+                    
+                    setTitle('@' + mem.name);
+                    document.querySelector('#channelTitle').innerHTML = getPrettyName(mem);   
+                } else {
+                    setTitle('#' + info().name);
+                    document.querySelector('#channelTitle').innerHTML = info().name;
+                    document.querySelector('#channelInfo').innerHTML = info().purpose.value.replace('\n', '<br>');    
+                }
+
+                const dobj_created = getDate(info().created);
+                const dobj_oldest = getDate(messages()[messages().length - 1].ts);
+                const dobj_latest = getDate(messages()[0].ts);
+
+                document.querySelector('#channelStats').innerHTML += 'Created: ' + dobj_created;
+                document.querySelector('#channelStats').innerHTML += '<br>Oldest Message: ' + dobj_oldest;
+                document.querySelector('#channelStats').innerHTML += '<br>Latest Message: ' + dobj_latest;
+                
+                const dateWidget = dateWidgetUI(dir, messages(), dobj_oldest, dobj_latest)
+                const memberWidget = memberWidgetUI(members())
+
+                for (const dateNode of dateWidget) {
+                    document.querySelector('#dateNavWidget').appendChild(dateNode);
+                }
+                
+                for (const memberNode of memberWidget) {
+                    document.querySelector('#members').appendChild(memberNode);
+                }
+
+                for (const trigger of document.querySelectorAll('button.collapse_trigger')) {
+                    toggleCollapse(trigger);
+                }
+
+            }
+
+        </script>
+        <link rel="stylesheet" href="main.css">
+    </head>
+    <body>
+        <div id = 'members'></div>
+        <h1 id = 'channelTitle'></h1>
+        <h3 id = 'channelInfo'></h3>
+        <div id = 'channelStats'></div>
+        <div id = 'dateNavWidget'></div>
+    </body>
+</html>
