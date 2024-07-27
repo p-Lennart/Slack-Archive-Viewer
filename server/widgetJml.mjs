@@ -1,6 +1,6 @@
-export function applyWidgetJml(widgetJmlFn, data, destQuery) {
-    let ui = widgetJmlFn(data);
-    for (const node of ui) {
+export function applyWidgetJml(destQuery, widgetJmlFn, archiveData, auxIn) {
+    let nodes = widgetJmlFn(archiveData, auxIn);
+    for (const node of nodes) {
         document.querySelector(destQuery).appendChild(node);
     }    
 }

@@ -9,16 +9,16 @@ export async function loadJSON(filename) {
 }
 
 export async function loadData(rootPath, mapFilename) {
-    const archiveMap = await loadJSON(mapFilename);
-    const archiveName = Object.keys(archiveMap)[0];
+    const rootMap = await loadJSON(mapFilename);
+    const archiveName = Object.keys(rootMap)[0];
     const archivePath = `${rootPath}/${archiveName}`;
 
     const channelsArr = await loadJSON(archivePath + `/channels.json`);
     const usersArr = await loadJSON(archivePath + `/users.json`);
 
     let archiveData = {
-        archiveName: Object.keys(archiveMap)[0],
-        archiveMap: archiveMap,
+        archiveName: Object.keys(rootMap)[0],
+        archiveMap: rootMap[archiveName],
         channelsArr: channelsArr,
         usersArr: usersArr,
     }

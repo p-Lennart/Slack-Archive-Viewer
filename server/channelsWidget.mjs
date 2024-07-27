@@ -18,7 +18,7 @@ export function channelsWidgetJml(data) {
         let creatorStr = formatUsernameFromId(i.creator, usersArr);
 
         let chan = jml('div', { class: 'channel'}, [
-            jml('a', { href: `./channelPage.htm?channel=${i.name}` },
+            jml('a', { href: `./channelPage.htm?id=${i.id}` },
                 jml('h3', {}, `#${i.name} (${i.id})`),
             ),
             jml('span', {}, 'Created: ' + createdStr),
