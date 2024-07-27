@@ -1,26 +1,10 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
     <head>
-        <script src = 'urlParams.js'></script>
+        <script src = 'urlParameters.js'></script>
         <script>
             function setTitle(str) {
                 document.title = `Slack | ${str}`;
-            }
-
-            function getURLParameters() {
-                const result = {};
-                
-                const paramStr = window.location.search.substring(1);
-                const pairs = paramStr.split('&');
-                
-                if (paramStr.length > 0) {
-                    for (const i of pairs) {
-                        let seperated = i.split('=');
-                        result[seperated[0]] = seperated[1];
-                    }        
-                }
-
-                return result;
             }
 
             function getDate(slackTS) {
@@ -78,7 +62,7 @@
         <script async type = "module">
             const { jml, jml_nester } = await import('./jml.mjs');
             const { dateWidgetUI } = await import('./dateWidget.mjs')
-            const { memberWidgetUI } = await import('memberWidget.mjs')
+            const { memberWidgetUI } = await import('./memberWidget.mjs')
 
             let params = getURLParameters();
             
@@ -141,4 +125,4 @@
         <div id = 'channelStats'></div>
         <div id = 'dateNavWidget'></div>
     </body>
-</html>
+</html> -->

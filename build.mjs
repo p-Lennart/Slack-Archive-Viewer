@@ -4,27 +4,27 @@ import { dirname, join } from 'path';
 import { createServer } from 'http-server';
 import open from 'open';
 
-import { mapViewerDataDir } from './mapViewerData.mjs';
+import { mapViewerData } from './mapViewerData.mjs';
 
 // Get the directory of the current module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Specify the directory to read
-const viewerPath = join(__dirname, './viewer')
+const viewerPath = join(__dirname, './server')
 const viewerDataPath = join(viewerPath, './VIEWERDATA');
 
-let viewerDirMap = mapViewerDataDir(viewerDataPath);
-writeMapJSON(viewerDirMap, './VIEWERDATA_MAP.json')
+let viewerDirMap = mapViewerData(viewerDataPath);
+writeMapJSON(viewerDirMap, viewerPath, './VIEWERDATA_map.json');
 
-launchViewingServer(8080, viewerPath, './viewer.htm');
+launchViewingServer(8080, viewerPath, './index.htm');
 
-function writeMapJSON(mapObj, relPath) {
+function writeMapJSON(mapObj, path, filename) {
     try {
-        let viewerDirMapJSON = JSON.stringify(mapObj, null, 3);
-        writeFileSync(join(__dirname, relPath), viewerDirMapJSON);
+        let mapJSON = JSON.stringify(mapObj, null, 3);
+        writeFileSync(join(path, filename), mapJSON);
 
-        console.log(`Viewer data map written to ${relPath}`);
+        console.log(`Viewer data map written to ${join(path, filename)}`);
     } catch (err) {
         throw new Error('Failed to write viewer data map file: ' + err);
     }

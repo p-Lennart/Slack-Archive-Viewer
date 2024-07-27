@@ -1,4 +1,4 @@
-function memberWidgetUI(members) {
+export function memberWidgetUI(members) {
     const memberNodes = [];
 
     for (const i of members) {

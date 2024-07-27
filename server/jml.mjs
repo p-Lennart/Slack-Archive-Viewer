@@ -12,7 +12,7 @@ export function jml(tagName, props, nest) {
 
     if (!nest) return el;
 
-    return jml_nester(el, nest)
+    return jml_nester(el, nest);
 }
 
 export function jml_nester(el, n) {
@@ -29,7 +29,7 @@ export function jml_nester(el, n) {
             }
         }
     } else if (n instanceof Node){
-        el.appendChild(n)
+        el.appendChild(n);
     }
     return el;
 }

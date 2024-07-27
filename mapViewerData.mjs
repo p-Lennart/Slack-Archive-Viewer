@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-export function mapViewerDataDir(rootPath) {
+export function mapViewerData(rootPath) {
     const rootMap = {};
     var rootEntries = [];
 
