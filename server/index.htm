@@ -29,28 +29,20 @@
 
         </script>
         <script async type = "module">
-            const { jml, jml_nester } = await import('./jml.mjs');
-            const { applyWidgetJml } = await import ('./widgetJml.mjs');
-            const { channelsWidgetJml } = await import('./channelsWidget.mjs');
-            const { loadJSON } = await import('./loadJSON.mjs');
+            import { jml, jml_nester } from './jml.mjs'
+            import { loadData } from './loadData.mjs'
+            
+            import { applyWidgetJml } from './widgetJml.mjs';
+            import { channelsWidgetJml } from './channelsWidget.mjs';
 
-            const map = await loadJSON('./VIEWERDATA_map.json');
-            const archiveName = Object.keys(map)[0];
+            const archiveData = await loadData('./VIEWERDATA', 'VIEWERDATA_map.json'); 
+            init(archiveData.channelsArr);
 
-            const channelsArr = await loadJSON(`./VIEWERDATA/${archiveName}/channels.json`);
-            const usersArr = await loadJSON(`./VIEWERDATA/${archiveName}/users.json`)
+            async function init(chansArr) {
+                document.tile = archiveData.archiveName;
+                document.querySelector('#heading').innerHTML = archiveData.archiveName;
 
-            init(channelsArr);
-
-            async function init(chans) {
-                setTitle(archiveName)
-                document.querySelector('#heading').innerHTML = archiveName;
-
-                let data = {
-                    channelsArr: channelsArr,
-                    usersArr: usersArr,
-                }
-                applyWidgetJml(channelsWidgetJml, data, '#channels');
+                applyWidgetJml(channelsWidgetJml, archiveData, '#channels');
             }
 
         </script>
