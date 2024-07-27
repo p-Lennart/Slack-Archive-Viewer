@@ -30,24 +30,27 @@
         </script>
         <script async type = "module">
             const { jml, jml_nester } = await import('./jml.mjs');
-            const { channelsWidgetUI } = await import('./channelsWidget.mjs')
-            const { loadJSON } = await import('./loadJSON.mjs')
+            const { applyWidgetJml } = await import ('./widgetJml.mjs');
+            const { channelsWidgetJml } = await import('./channelsWidget.mjs');
+            const { loadJSON } = await import('./loadJSON.mjs');
 
             const map = await loadJSON('./VIEWERDATA_map.json');
             const archiveName = Object.keys(map)[0];
-            const channels = await loadJSON(`./VIEWERDATA/${archiveName}/channels.json`)
 
-            init();
+            const channelsArr = await loadJSON(`./VIEWERDATA/${archiveName}/channels.json`);
+            const usersArr = await loadJSON(`./VIEWERDATA/${archiveName}/users.json`)
 
-            async function init() {
+            init(channelsArr);
+
+            async function init(chans) {
                 setTitle(archiveName)
                 document.querySelector('#heading').innerHTML = archiveName;
 
-                let channelsUI = channelsWidgetUI(channels);
-                console.log(channelsUI);
-                for (const channelNode of channelsUI) {
-                    document.querySelector('#channels').appendChild(channelNode);
+                let data = {
+                    channelsArr: channelsArr,
+                    usersArr: usersArr,
                 }
+                applyWidgetJml(channelsWidgetJml, data, '#channels');
             }
 
         </script>

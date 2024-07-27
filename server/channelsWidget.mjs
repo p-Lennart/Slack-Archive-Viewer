@@ -1,18 +1,29 @@
-const { jml, jml_nester } = await import('./jml.mjs');
+import { jml, jml_nester } from './jml.mjs';
+import { formatSlackDateFromTs } from './timestamps.mjs';
+import { formatUsernameFromId } from './users.mjs';
 
-export function channelsWidgetUI(channelsObj) {
+export function channelsWidgetJml(data) {
+    const channelsArr = data.channelsArr;
+    const usersArr = data.usersArr;
+
     const channelNodes = [];
 
-    console.log('chanobj ', channelsObj);
-    for (const i of channelsObj) {
+    console.log('chanobj ', channelsArr);
+    for (const i of channelsArr) {
         if (!i.pins) {
             i.pins = [];
         }
+        
+        let createdStr = formatSlackDateFromTs(i.created);
+        let creatorStr = formatUsernameFromId(i.creator, usersArr);
+
         let chan = jml('div', { class: 'channel'}, [
-            jml('h3', {}, `#${i.name} (${i.id})`),
-            jml('span', {}, 'Created: ' + i.created),
+            jml('a', { href: `./channelPage.htm?channel=${i.name}` },
+                jml('h3', {}, `#${i.name} (${i.id})`),
+            ),
+            jml('span', {}, 'Created: ' + createdStr),
             jml('br'),
-            jml('span', {}, 'Creator: ' + i.creator),
+            jml('span', {}, 'Creator: ' + creatorStr),
             jml('br'),
             jml('span', {}, 'Archived: ' + i.is_archived),
             jml('br'),
