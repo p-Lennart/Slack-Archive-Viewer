@@ -1,41 +1,10 @@
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
     <head>
         <script src = 'urlParameters.js'></script>
         <script>
             function setTitle(str) {
                 document.title = `Slack | ${str}`;
-            }
-
-            function getDate(slackTS) {
-                return new Date(parseFloat(slackTS) * 1000);
-            }
-
-            function getDateString(date) {
-                let hours = date.getHours();
-                let minutes = date.getMinutes(); 
-                let seconds = date.getSeconds();
-                return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            }
-
-            function getPrettyName(member) {
-                if (member.profile && member.profile['display_name'].length > 0)
-                    return member.profile['display_name'];
-                else 
-                    return member['real_name'];
-            }
-
-            function getMessagesInSpan(messages, start, end) {
-                const result = [];
-                
-                for (const i of messages) {
-                    if (i.ts && i.ts < (end / 1000) && i.ts >= (start / 1000)) {
-                        result.push(i);
-                    }
-                }
-
-                return result;
-                
             }
         
             function setDisplay(ID, value) {
@@ -60,69 +29,54 @@
 
         </script>
         <script async type = "module">
-            const { jml, jml_nester } = await import('./jml.mjs');
-            const { dateWidgetUI } = await import('./dateWidget.mjs')
-            const { memberWidgetUI } = await import('./memberWidget.mjs')
+            import { jml, jml_nester } from './jml.mjs';
+            import { loadData } from './loadData.mjs';
+            import { formatSlackDateFromTs } from './timestamps.mjs'
+            import { formatUsernameFromId } from './users.mjs';
 
-            let params = getURLParameters();
+            import { applyWidgetJml } from './widgetJml.mjs';
             
-            if (!params.type || !params.id) {
-                console.log('Missing parameters'); 
-            } else {
-                let dir = `./VIEWERDATA/${params.type}/${params.id}`;
-                console.log(dir);
-
-                init(dir);
+            import { membersWidgetJml } from './membersWidget.mjs';
+            import { channelEntriesWidgetJml } from './channelEntriesWidget.mjs';
+            
+            let params = getURLParameters();
+            const archiveData = await loadData('./VIEWERDATA', 'VIEWERDATA_map.json'); 
+            
+            if (!params.id) {
+                throw new Error('Missing parameter "id"'); 
             }
 
+            const channelData = archiveData.channelsArr.find((c) => c.id === params.id);
+            const channelName = channelData.name;
+            const channelMap = archiveData.archiveMap[channelName];
+
+            let channelPath = `./VIEWERDATA/${archiveData.archiveName}/${channelName}`;
+            console.log(channelPath);
+
+            init(channelPath);
+
             async function init(dir) {
-                // const { info, members, messages, threads } = await import(...
-                // FETCH CHANNEL DATA into info(), members(), messages(), threads()
+                setTitle('#' + channelName);
+                document.querySelector('#channelTitle').innerHTML = '#' + channelName;
+                document.querySelector('#channelPurpose').innerHTML = channelData.purpose.value.replace('\n', '<br>');    
 
-                if (info()['is_im'] && info().user) {
-                    let mem = members().find(member => member.id === info().user);
-                    
-                    setTitle('@' + mem.name);
-                    document.querySelector('#channelTitle').innerHTML = getPrettyName(mem);   
-                } else {
-                    setTitle('#' + info().name);
-                    document.querySelector('#channelTitle').innerHTML = info().name;
-                    document.querySelector('#channelInfo').innerHTML = info().purpose.value.replace('\n', '<br>');    
-                }
-
-                const dobj_created = getDate(info().created);
-                const dobj_oldest = getDate(messages()[messages().length - 1].ts);
-                const dobj_latest = getDate(messages()[0].ts);
-
-                document.querySelector('#channelStats').innerHTML += 'Created: ' + dobj_created;
-                document.querySelector('#channelStats').innerHTML += '<br>Oldest Message: ' + dobj_oldest;
-                document.querySelector('#channelStats').innerHTML += '<br>Latest Message: ' + dobj_latest;
+                document.querySelector('#channelStats').innerHTML += 'Created: ' + formatSlackDateFromTs(channelData.created);
+                document.querySelector('#channelStats').innerHTML += '<br>Creator: ' + formatUsernameFromId(channelData.creator, archiveData.usersArr);
+                document.querySelector('#channelStats').innerHTML += '<br>Archived: ' + channelData.is_archived;
                 
-                const dateWidget = dateWidgetUI(dir, messages(), dobj_oldest, dobj_latest)
-                const memberWidget = memberWidgetUI(members())
-
-                for (const dateNode of dateWidget) {
-                    document.querySelector('#dateNavWidget').appendChild(dateNode);
-                }
-                
-                for (const memberNode of memberWidget) {
-                    document.querySelector('#members').appendChild(memberNode);
-                }
-
-                for (const trigger of document.querySelectorAll('button.collapse_trigger')) {
-                    toggleCollapse(trigger);
-                }
-
+                applyWidgetJml('#members', membersWidgetJml, archiveData, channelData.members);
+                applyWidgetJml('#channelEntries', channelEntriesWidgetJml, archiveData, channelName);
             }
 
         </script>
         <link rel="stylesheet" href="main.css">
     </head>
     <body>
-        <div id = 'members'></div>
-        <h1 id = 'channelTitle'></h1>
-        <h3 id = 'channelInfo'></h3>
-        <div id = 'channelStats'></div>
-        <div id = 'dateNavWidget'></div>
+        <div id='members'></div>
+        <h1 id='channelTitle'></h1>
+        <h3 id='channelTopic'></h2>
+        <h3 id='channelPurpose'></h3>
+        <div id='channelStats'></div>
+        <div id='channelEntries'></div>
     </body>
-</html> -->
+</html>

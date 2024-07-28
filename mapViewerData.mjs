@@ -87,7 +87,9 @@ function mapChannelDir(channelPath) {
             throw new Error(`Channel directory ${channelPath} must contain only JSON files, but contains file '${entryName}'`);
         }
 
-        channelMap[entryName] = 'JSON';
+        let messagesData = fs.readFileSync(path.join(channelPath, entryName));
+        let messages = JSON.parse(messagesData);
+        channelMap[entryName] = messages.length;
     }
 
     return channelMap;
