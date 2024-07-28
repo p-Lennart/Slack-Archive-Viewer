@@ -1,156 +1,83 @@
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
     <head>
         <script src = 'urlParameters.js'></script>
+        <script>
+            function setTitle(str) {
+                document.title = `Slack | ${str}`;
+            }
+        
+            function setDisplay(ID, value) {
+                document.getElementById(ID).style.display = value;
+            }
+
+            function toggleCollapse(t) {
+                let contentID = t.id.split('Title').join('Content');
+                let titleMaxID = t.id + 'Max';
+                let titleMinID = t.id + 'Min';
+
+                if (document.getElementById(contentID).style.display === 'none') {
+                    setDisplay(contentID, 'block');
+                    setDisplay(titleMaxID, 'block');
+                    setDisplay(titleMinID, 'none');
+                } else {
+                    setDisplay(contentID, 'none');
+                    setDisplay(titleMaxID, 'none');
+                    setDisplay(titleMinID, 'block');
+                }
+            }
+        </script>
         <script async type = "module">
-            const { jml, jml_nester } = await import('./jml.mjs');
+            import { jml, jml_nester } from './jml.mjs';
+            import { loadJSON, loadData } from './loadData.mjs';
+            import { applyWidgetJml } from './widgetJml.mjs';
+            import { membersWidgetJml } from './membersWidget.mjs';
+            import { channelMessagesJml } from './channelMessages.mjs';
 
             let params = getURLParameters();
             
-            if (!params.type || !params.id) {
-                console.log('Missing parameters'); 
-            } else {
-                let dir = `../archives/${params.type}/${params.id}`;
-                console.log(dir);
-
-                init(dir, params.ts);
+            if (!params.id) {
+                throw new Error('Missing parameter "id"'); 
+            }
+            if (!params.date) {
+                throw new Error('Missing parameter "date"'); 
             }
 
-            function renderMessageText(message) {
-                if (message.blocks) {
-                    try {
-                        const blocks = [];
-                        for (const block of message.blocks) {
-                            const elements = [];
-                            if (!block.elements) {
-                                console.log('Block has no elements', block);
-                                return [];
-                            }
-                            for (const element of block.elements) {
-                                const subElements = [];
-                                for (const subElement of element.elements) {
-                                    var content = '';
-                                    switch (subElement.type) {
-                                        case 'emoji':
-                                            if (subElement.unicode) {
-                                                for (const e of subElement.unicode.split('-')) {
-                                                    content += String.fromCodePoint('0x' + e);
-                                                }
-                                            } else {
-                                                content = subElement.name;
-                                            }
-                                            break;
-                                        case 'text':
-                                            content = subElement.text;
-                                    }
-                                    subElements.push(jml('span', { class: 'element_element ' + subElement.type }, content));
-                                }
-                                elements.push(jml('span', { class: 'block_element ' + element.type }, subElements));
-                            }
-                            blocks.push(jml('span', { class: 'message_block' }, elements))
-                        }
-        
-                        return blocks;
-    
-                    } catch(err) {
-                        console.error(err);
-                        console.log(message);
-                    }
-                }
+            const archiveData = await loadData('./VIEWERDATA', 'VIEWERDATA_map.json'); 
+            
+            const channelData = archiveData.channelsArr.find((c) => c.id === params.id);
+            const channelName = channelData.name;
+            const channelMap = archiveData.archiveMap[channelName];
 
-                return [ jml('span', {}, message.text) ];
+            let channelPath = `./VIEWERDATA/${archiveData.archiveName}/${channelName}`;
+            console.log(channelPath);
+
+            const messages = await loadJSON(`${channelPath}/${params.date}.json`);
+
+            init(channelPath, params.date)
+
+            async function init(path, date) {
+                setTitle('#' + channelName);
+
+                document.querySelector('#channelTitle').innerHTML = '#' + channelName;
+                document.querySelector('#channelTopic').innerHTML = channelData.topic.value.replace('\n', '<br>');;
+                document.querySelector('#channelPurpose').innerHTML = channelData.purpose.value.replace('\n', '<br>');    
+
+                applyWidgetJml('#members', membersWidgetJml, archiveData, channelData.members);
+                applyWidgetJml('#messages', channelMessagesJml, archiveData, messages);
             }
 
-            function renderMessageFiles(message) { 
-                if (!message.files) return;
-
-                const result = [];
-
-                for (const file of message.files) {
-                    if (!file.permalink) {
-                        console.log('File missing permalink', file);
-                        continue;
-                    }
-
-                    let filename = file.permalink.split('/').pop();
-                    var path = `../archives/${params.type}/${params.id}/files/${file.id}/${filename}`;
-
-                    if (file.mimetype && file.mimetype.startsWith('image/')) {
-                        result.push(jml('img', { src: path }));
-                    }
-                }
-
-                return result;
-            }
-
-            function renderMessage([message, members], newGroup) {
-                if (!message.type === 'message') return;
-
-                var className = 'message_container';
-                if (!newGroup) className += ' is_sequel';
-                if (message.edited) className += ' is_edited';
-
-                let date = getDate(message.ts);
-
-                var user;
-                if (message.subtype && message.subtype === "bot_message") {
-                    user = members.find(m => m.profile && m.profile['api_app_id'] && m.profile['api_app_id'] === message['app_id']);
-                } else if (members.find(m => m.id === message.user)) {
-                    user = members.find(m => m.id === message.user);
-                } else {
-                    user = "???";
-                }
-
-                var content = renderMessageText(message);
-                if (message.files) {
-                    content.push(jml('figure', { class: 'message_files' }, renderMessageFiles(message)));
-                }
-                if (message.edited) {
-                    content.push(jml('span', { class: 'message_editTag' }, '(edited)'));
-                }
-                
-                return jml('tr', { id: message.user, class: className }, [
-                    jml('td', { class: 'message_ts' }, getDateString(date)),
-                    jml('td', { class: 'message_user' }, newGroup ? getPrettyName(user) : ''),
-                    jml('td', { class: 'message_content' }, content),
-                ])
-            }
-
-            async function init(dir, ts) {
-                const { info, members, messages, threads } = await import(dir + '/data.mjs');
-
-                if (info()['is_im'] && info().user) {
-                    let mem = members().find(member => member.id === info().user);
-                    
-                    setTitle('@' + mem.name);
-                    document.querySelector('#channelTitle').innerHTML = getPrettyName(mem);   
-                } else {
-                    setTitle('#' + info().name);
-                    document.querySelector('#channelTitle').innerHTML = info().name;
-                    document.querySelector('#channelInfo').innerHTML = info().purpose.value.replace('\n', '<br>');    
-                }
-
-                for (var i = messages().length - 1; i >= 0; i--) {
-                    let newGroup = (!messages()[i+1] || messages()[i].user !== messages()[i+1].user);
-                    document.querySelector('#messages').appendChild(renderMessage([messages()[i], members()], newGroup));
-                }
-                
-                // for (const memberNode of memberUI(members())) {
-                //     document.querySelector('#members').appendChild(memberNode);
-                // }
-
-            }
 
         </script>
         <link rel="stylesheet" href="main.css">
     </head>
     <body>
-        <h1>THIS WORKS!</h1>
-        <div id = 'members'></div>
-        <h1 id = 'channelTitle'></h1>
-        <h3 id = 'channelInfo'></h3>
-        <div class = 'container'>
-            <table id = 'messages'></table>
+        <div id='members'></div>
+        <h1 id='channelTitle'></h1>
+        <h2 id='channelTopic'></h2>
+        <h3 id='channelPurpose'></h3>
+        <div class='container'>
+            <table id='messages'></table>
         </div>
     </body>
-</html> -->
+</html>

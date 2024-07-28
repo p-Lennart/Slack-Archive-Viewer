@@ -26,7 +26,6 @@
                     setDisplay(titleMinID, 'block');
                 }
             }
-
         </script>
         <script async type = "module">
             import { jml, jml_nester } from './jml.mjs';
@@ -35,17 +34,16 @@
             import { formatUsernameFromId } from './users.mjs';
 
             import { applyWidgetJml } from './widgetJml.mjs';
-            
             import { membersWidgetJml } from './membersWidget.mjs';
             import { channelEntriesWidgetJml } from './channelEntriesWidget.mjs';
             
             let params = getURLParameters();
-            const archiveData = await loadData('./VIEWERDATA', 'VIEWERDATA_map.json'); 
-            
             if (!params.id) {
                 throw new Error('Missing parameter "id"'); 
             }
-
+            
+            const archiveData = await loadData('./VIEWERDATA', 'VIEWERDATA_map.json'); 
+            
             const channelData = archiveData.channelsArr.find((c) => c.id === params.id);
             const channelName = channelData.name;
             const channelMap = archiveData.archiveMap[channelName];
@@ -58,6 +56,7 @@
             async function init(dir) {
                 setTitle('#' + channelName);
                 document.querySelector('#channelTitle').innerHTML = '#' + channelName;
+                document.querySelector('#channelTopic').innerHTML = channelData.topic.value.replace('\n', '<br>');;
                 document.querySelector('#channelPurpose').innerHTML = channelData.purpose.value.replace('\n', '<br>');    
 
                 document.querySelector('#channelStats').innerHTML += 'Created: ' + formatSlackDateFromTs(channelData.created);
@@ -74,7 +73,7 @@
     <body>
         <div id='members'></div>
         <h1 id='channelTitle'></h1>
-        <h3 id='channelTopic'></h2>
+        <h2 id='channelTopic'></h2>
         <h3 id='channelPurpose'></h3>
         <div id='channelStats'></div>
         <div id='channelEntries'></div>
