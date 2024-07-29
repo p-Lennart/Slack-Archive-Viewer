@@ -1,17 +1,18 @@
+import { jml } from './jml.mjs';
 
-export function formatUsernameFromId(USERS_ARR, id) {
-    let user = userFromId(USERS_ARR, id);
+export function formatUsernameFromId(USERS_ARR, userId) {
+    let user = userFromId(USERS_ARR, userId);
     return `${user.profile.display_name_normalized} (${user.real_name})`;
 }
 
-export function prettyNameFromId(USERS_ARR, id) {
-    let user = userFromId(USERS_ARR, id);
+export function prettyNameFromId(USERS_ARR, userId) {
+    let user = userFromId(USERS_ARR, userId);
     return prettyNameFromUserObj(user);
 }
 
-export function userFromId(USERS_ARR, id) {
+export function userFromId(USERS_ARR, userId) {
     for (let u of USERS_ARR) {
-        if (u.id === id) {
+        if (u.id === userId) {
             return u;
         }
     }
@@ -23,4 +24,10 @@ export function prettyNameFromUserObj(userObj) {
         return userObj.profile['display_name'];
     else 
         return userObj['real_name'];
+}
+
+export function mentionJmlFromId(USERS_ARR, userId) {
+    return jml('a', 
+        { href: `./userPage.htm?id=${userId}` },
+        '@' + prettyNameFromId(USERS_ARR, userId)); 
 }

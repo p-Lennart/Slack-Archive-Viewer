@@ -5,8 +5,6 @@ export function usersWidgetJml(ARCHIVE_DATA, memberIdsArr) {
     const userCardNodes = [];
     
     for (const user of ARCHIVE_DATA.USERS_ARR) {
-        console.log('mia:', memberIdsArr);
-
         if (!memberIdsArr || memberIdsArr.includes(user.id)) {
             userCardNodes.push(userCardJml(user));
         }

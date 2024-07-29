@@ -1,5 +1,5 @@
 import { jml } from './jml.mjs';
-import { prettyNameFromId } from './users.mjs';
+import { prettyNameFromId, mentionJmlFromId } from './users.mjs';
 import { formatSlackTimeFromTs } from './timestamps.mjs';
 
 export function channelMessagesJml(ARCHIVE_DATA, messages) {
@@ -114,19 +114,13 @@ function contentFromSubElement(USERS_ARR, subElement) {
             content = subElement.text;
             break;
         case 'user':
-            content = renderMention(USERS_ARR, subElement.user_id);
+            content = mentionJmlFromId(USERS_ARR, subElement.user_id);
             break;
         default:
             console.log("DONT KNOW WHAT TO DO", subElement);
     }
 
     return content;
-}
-
-function renderMention(USERS_ARR, userId) {
-    return jml('a', 
-        { href: `./userPage.htm?id=${userId}` },
-        '@' + prettyNameFromId(USERS_ARR, userId)); 
 }
 
 function renderMessageFiles(message) { 

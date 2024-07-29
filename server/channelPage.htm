@@ -35,6 +35,7 @@
 
             import { applyWidgetJml } from './widgetJml.mjs';
             import { usersWidgetJml } from './usersWidget.mjs';
+            import { channelHeadingWidgetMjs } from './channelHeadingWidget.mjs'
             import { channelEntriesWidgetJml } from './channelEntriesWidget.mjs';
             
             let params = getURLParameters();
@@ -44,8 +45,8 @@
             
             const ARCHIVE_DATA = await loadData('./VIEWERDATA', 'VIEWERDATA_map.json'); 
             
-            const channelData = ARCHIVE_DATA.CHANNELS_ARR.find((c) => c.id === params.id);
-            const channelName = channelData.name;
+            const channelObj = ARCHIVE_DATA.CHANNELS_ARR.find((c) => c.id === params.id);
+            const channelName = channelObj.name;
             const channelMap = ARCHIVE_DATA.ARCHIVE_MAP[channelName];
 
             let channelPath = `./VIEWERDATA/${ARCHIVE_DATA.ARCHIVE_NAME}/${channelName}`;
@@ -56,14 +57,11 @@
             async function init(dir) {
                 setTitle('#' + channelName);
                 document.querySelector('#channelTitle').innerHTML = '#' + channelName;
-                document.querySelector('#channelTopic').innerHTML = channelData.topic.value.replace('\n', '<br>');;
-                document.querySelector('#channelPurpose').innerHTML = channelData.purpose.value.replace('\n', '<br>');    
+                // document.querySelector('#channelTopic').innerHTML = channelObj.topic.value.replace('\n', '<br>');;
+                // document.querySelector('#channelPurpose').innerHTML = channelObj.purpose.value.replace('\n', '<br>');    
 
-                document.querySelector('#channelStats').innerHTML += 'Created: ' + formatSlackDateFromTs(channelData.created);
-                document.querySelector('#channelStats').innerHTML += '<br>Creator: ' + formatUsernameFromId(ARCHIVE_DATA.USERS_ARR, channelData.creator);
-                document.querySelector('#channelStats').innerHTML += '<br>Archived: ' + channelData.is_archived;
-                
-                applyWidgetJml('#members', usersWidgetJml, ARCHIVE_DATA, channelData.members);
+                applyWidgetJml('#members', usersWidgetJml, ARCHIVE_DATA, channelObj.members);
+                applyWidgetJml('#channelHeading', channelHeadingWidgetMjs, ARCHIVE_DATA, channelName);
                 applyWidgetJml('#channelEntries', channelEntriesWidgetJml, ARCHIVE_DATA, channelName);
             }
 
@@ -74,9 +72,7 @@
     <body>
         <div id='members'></div>
         <h1 id='channelTitle'></h1>
-        <h2 id='channelTopic'></h2>
-        <div id='channelPurpose'></div>
-        <div id='channelStats'></div>
+        <div id='channelHeading'></div>
         <div id='channelEntries'></div>
     </body>
 </html>

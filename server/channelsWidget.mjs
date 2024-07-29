@@ -1,46 +1,23 @@
 import { jml, jml_nester } from './jml.mjs';
-import { formatSlackDateFromTs } from './timestamps.mjs';
-import { formatUsernameFromId } from './users.mjs';
+import { channelHeadingWidgetMjs } from './channelHeadingWidget.mjs';
 
-export function channelsWidgetJml(data) {
-    const CHANNELS_ARR = data.CHANNELS_ARR;
-    const USERS_ARR = data.USERS_ARR;
-
+export function channelsWidgetJml(ARCHIVE_DATA) {
+    const CHANNELS_ARR = ARCHIVE_DATA.CHANNELS_ARR;
     const channelNodes = [];
 
-    console.log('chanobj ', CHANNELS_ARR);
-    for (const i of CHANNELS_ARR) {
-        if (!i.pins) {
-            i.pins = [];
+    for (const channelObj of CHANNELS_ARR) {
+        if (!channelObj.pins) {
+            channelObj.pins = [];
         }
-        
-        let createdStr = formatSlackDateFromTs(i.created);
-        let creatorStr = formatUsernameFromId(USERS_ARR, i.creator);
+    
+        let channelNodeNodes = [
+            jml('a', { href: `./channelPage.htm?id=${channelObj.id}` },
+            jml('h3', {}, `#${channelObj.name} (${channelObj.id})`),
+        )];
 
-        let chan = jml('div', { class: 'channel'}, [
-            jml('a', { href: `./channelPage.htm?id=${i.id}` },
-                jml('h3', {}, `#${i.name} (${i.id})`),
-            ),
-            jml('span', {}, 'Created: ' + createdStr),
-            jml('br'),
-            jml('span', {}, 'Creator: ' + creatorStr),
-            jml('br'),
-            jml('span', {}, 'Archived: ' + i.is_archived),
-            jml('br'),
-            jml('span', {}, 'Topic: ' + i.topic.value),
-            jml('br'),
-            jml('span', {}, 'Purpose:  ' + i.purpose.value),
-            jml('br'),
+        channelNodeNodes = channelNodeNodes.concat(channelHeadingWidgetMjs(ARCHIVE_DATA, channelObj.name));
 
-            jml('span', {}, i.members.length + ' members'),
-            jml('br'),
-            jml('span', {}, i.pins.length + ' pins'),
-            
-        ]);
-
-        channelNodes.push(chan);
-
+        channelNodes.push(jml('div', { class: 'channel'}, channelNodeNodes));
     }
-
     return channelNodes;
 }
