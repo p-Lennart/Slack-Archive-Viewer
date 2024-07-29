@@ -41,27 +41,32 @@ export function renderMessage(ind, messages, usersArr) {
         user = usersArr.find(m => m.id === message.user);
     }
 
-    var contentNodes = renderMessageText(message);
-    if (message.files) {
-        contentNodes.push(jml('figure', { class: 'message_files' }, renderMessageFiles(message)));
-    }
-    if (message.edited) {
-        contentNodes.push(jml('span', { class: 'message_editTag' }, '(edited)'));
+    const messageBodyNodes = [];
+
+    if (user && !isSequel) {
+        let nametag = prettyNameFromId(user.id, usersArr);
+        messageBodyNodes.push(jml('span', { class: 'message_user' }, nametag));
+        messageBodyNodes.push(jml('br'));
     }
 
-    var nametag = ''
-    if (user && !isSequel) {
-        nametag = prettyNameFromId(user.id, usersArr);
+    messageBodyNodes.push(renderMessageText(message));
+    
+    if (message.files) {
+        messageBodyNodes.push(jml('figure', { class: 'message_files' }, renderMessageFiles(message)));
     }
+    if (message.edited) {
+        messageBodyNodes.push(jml('span', { class: 'message_editTag' }, '(edited)'));
+    }
+
     
     return jml('tr', { id: message.user, class: className }, [
         jml('td', { class: 'message_ts' }, formatSlackTimeFromTs(message.ts)),
-        jml('td', { class: 'message_user' }, nametag),
-        jml('td', { class: 'message_content' }, contentNodes),
+        // jml('td', { class: 'message_user' }, nametag),
+        jml('td', { class: 'message_body' }, messageBodyNodes),
     ])
 }
 
-export function renderMessageText(message) {
+function renderMessageText(message) {
     if (message.blocks) {
         try {
             const blocks = [];
@@ -82,7 +87,7 @@ export function renderMessageText(message) {
                 blocks.push(jml('span', { class: 'message_block' }, elements))
             }
 
-            return blocks;
+            return jml('span', { class: 'message_content'}, blocks);
 
         } catch(err) {
             console.error(err);
@@ -90,7 +95,7 @@ export function renderMessageText(message) {
         }
     }
 
-    return [ jml('span', {}, message.text) ];
+    return jml('span', { class: 'message_content' }, message.text);
 }
 
 function contentFromSubElement(subElement) {

@@ -1,3 +1,7 @@
+h1, h2 {
+    padding-left: 5px;
+}
+
 span.accent {
     color: grey;
 }
@@ -6,8 +10,13 @@ div {
     margin-bottom: 12px;
 }
 
+div.container {
+    display: flex
+}
+
 div.container table {
-    width: 100%;
+    /* width: 100%; */
+    flex: 1;
 
     table-layout: fixed;
     vertical-align: text-top;
@@ -23,7 +32,7 @@ div.container table {
 table#messages tr td {
     vertical-align: top;
     padding: 5px;
-    padding-top: 10px;
+    /* padding-top: 10px; */
 }
 table#messages tr.message_container.is_sequel td {
     padding-top: 0px;
@@ -39,7 +48,7 @@ table#messages tr td.message_ts {
     text-align: center;
 }
 
-table#messages tr td.message_user {
+/* table#messages tr td.message_user {
     width: 10%;
     
     text-align: right;
@@ -48,28 +57,33 @@ table#messages tr td.message_user {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
+} */
 
-table#messages tr td.message_content {
+table#messages tr td.message_body {
     width: 88%;
     overflow-wrap: break-word;
 }
 
-table#messages tr td.message_content figure {
+table#messages tr td.message_body figure {
     margin: 0;
     margin-top: 0.125em;
     /* margin-bottom: 0.05em; */
 }
 
-table#messages tr td.message_content figure img {
+table#messages tr td.message_body span.message_user {
+    font-weight: bolder;
+    margin-bottom: 5px;
+}
+
+table#messages tr td.message_body figure img {
     max-height: 25em;
     max-width: 75em;
 }
 
-table#messages tr td.message_content span.message_editTag {
+table#messages tr td.message_body span.message_editTag {
     font-size: 0.9em;
     padding: 0;
-    padding-left: 0.4em;
+    /* padding-left: 0.4em; */
     color: grey;
     font-weight: lighter;
     vertical-align: text-top;
@@ -101,40 +115,4 @@ ul.collapse_content {
 ol.collapse_content {
     margin: 0px;
     margin-bottom: 5px;
-}
-
-div#members {
-    display: flex;
-    flex-direction: column;
-    float: right; 
-}
-div.user {
-    margin: 0px;
-    margin-bottom: 5px;
-    float: left;
-    
-    width: 360px;
-    height: 72px;
-    overflow: hidden;
-    
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-}
-div.user:hover {
-    overflow: visible;
-    height: auto;
-}
-img.user_picture {
-    vertical-align: text-top;
-    display: inline;
-}
-div.user_text {
-    margin: 0px;
-    margin-left: 5px;
-    margin-right: 2px;
-}
-div.user_text > * {
-    margin: 0px;
-    margin-bottom: 4px;
 }

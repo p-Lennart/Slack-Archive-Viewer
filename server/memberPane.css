@@ -1,0 +1,38 @@
+div#members {
+    display: flex;
+    flex-direction: column;
+    float: right; 
+}
+div.user {
+    margin: 0px;
+    margin-bottom: 5px;
+    float: left;
+    
+    width: 360px;
+    height: 72px;
+    overflow: hidden;
+    font-family: sans-serif;
+    
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+}
+div.user:hover {
+    overflow: visible;
+    height: auto;
+}
+img.user_picture {
+    vertical-align: text-top;
+    display: inline;
+}
+div.user_text {
+    font-size: 16px;
+        
+    margin: 0px;
+    margin-left: 5px;
+    margin-right: 2px;
+}
+div.user_text > * {
+    margin: 0px;
+    margin-bottom: 4px;
+}
