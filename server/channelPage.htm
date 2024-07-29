@@ -42,13 +42,13 @@
                 throw new Error('Missing parameter "id"'); 
             }
             
-            const archiveData = await loadData('./VIEWERDATA', 'VIEWERDATA_map.json'); 
+            const ARCHIVE_DATA = await loadData('./VIEWERDATA', 'VIEWERDATA_map.json'); 
             
-            const channelData = archiveData.channelsArr.find((c) => c.id === params.id);
+            const channelData = ARCHIVE_DATA.CHANNELS_ARR.find((c) => c.id === params.id);
             const channelName = channelData.name;
-            const channelMap = archiveData.archiveMap[channelName];
+            const channelMap = ARCHIVE_DATA.ARCHIVE_MAP[channelName];
 
-            let channelPath = `./VIEWERDATA/${archiveData.archiveName}/${channelName}`;
+            let channelPath = `./VIEWERDATA/${ARCHIVE_DATA.ARCHIVE_NAME}/${channelName}`;
             console.log(channelPath);
 
             init(channelPath);
@@ -60,11 +60,11 @@
                 document.querySelector('#channelPurpose').innerHTML = channelData.purpose.value.replace('\n', '<br>');    
 
                 document.querySelector('#channelStats').innerHTML += 'Created: ' + formatSlackDateFromTs(channelData.created);
-                document.querySelector('#channelStats').innerHTML += '<br>Creator: ' + formatUsernameFromId(channelData.creator, archiveData.usersArr);
+                document.querySelector('#channelStats').innerHTML += '<br>Creator: ' + formatUsernameFromId(ARCHIVE_DATA.USERS_ARR, channelData.creator);
                 document.querySelector('#channelStats').innerHTML += '<br>Archived: ' + channelData.is_archived;
                 
-                applyWidgetJml('#members', membersWidgetJml, archiveData, channelData.members);
-                applyWidgetJml('#channelEntries', channelEntriesWidgetJml, archiveData, channelName);
+                applyWidgetJml('#members', membersWidgetJml, ARCHIVE_DATA, channelData.members);
+                applyWidgetJml('#channelEntries', channelEntriesWidgetJml, ARCHIVE_DATA, channelName);
             }
 
         </script>

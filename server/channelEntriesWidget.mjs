@@ -1,8 +1,8 @@
 import { jml, jml_nester } from './jml.mjs';
 
-export function channelEntriesWidgetJml(archiveData, channelName) {
-    const channelData = archiveData.channelsArr.find((c) => c.name === channelName);
-    const channelMap = archiveData.archiveMap[channelName];    
+export function channelEntriesWidgetJml(ARCHIVE_DATA, channelName) {
+    const channelData = ARCHIVE_DATA.CHANNELS_ARR.find((c) => c.name === channelName);
+    const channelMap = ARCHIVE_DATA.ARCHIVE_MAP[channelName];    
     const channelEntries = Object.keys(channelMap);
 
     const channelEntryNodes = [];

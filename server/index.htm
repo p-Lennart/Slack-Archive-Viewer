@@ -35,14 +35,14 @@
             import { applyWidgetJml } from './widgetJml.mjs';
             import { channelsWidgetJml } from './channelsWidget.mjs';
 
-            const archiveData = await loadData('./VIEWERDATA', 'VIEWERDATA_map.json'); 
-            init(archiveData.channelsArr);
+            const ARCHIVE_DATA = await loadData('./VIEWERDATA', 'VIEWERDATA_map.json'); 
+            init(ARCHIVE_DATA.CHANNELS_ARR);
 
             async function init(chansArr) {
-                document.tile = archiveData.archiveName;
-                document.querySelector('#heading').innerHTML = archiveData.archiveName;
+                document.tile = ARCHIVE_DATA.ARCHIVE_NAME;
+                document.querySelector('#heading').innerHTML = ARCHIVE_DATA.ARCHIVE_NAME;
 
-                applyWidgetJml('#channels', channelsWidgetJml, archiveData, null);
+                applyWidgetJml('#channels', channelsWidgetJml, ARCHIVE_DATA, null);
             }
 
         </script>

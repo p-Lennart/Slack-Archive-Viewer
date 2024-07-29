@@ -43,13 +43,13 @@
                 throw new Error('Missing parameter "date"'); 
             }
 
-            const archiveData = await loadData('./VIEWERDATA', 'VIEWERDATA_map.json'); 
+            const ARCHIVE_DATA = await loadData('./VIEWERDATA', 'VIEWERDATA_map.json'); 
             
-            const channelData = archiveData.channelsArr.find((c) => c.id === params.id);
+            const channelData = ARCHIVE_DATA.CHANNELS_ARR.find((c) => c.id === params.id);
             const channelName = channelData.name;
-            const channelMap = archiveData.archiveMap[channelName];
+            const channelMap = ARCHIVE_DATA.ARCHIVE_MAP[channelName];
 
-            let channelPath = `./VIEWERDATA/${archiveData.archiveName}/${channelName}`;
+            let channelPath = `./VIEWERDATA/${ARCHIVE_DATA.ARCHIVE_NAME}/${channelName}`;
             console.log(channelPath);
 
             const messages = await loadJSON(`${channelPath}/${params.date}.json`);
@@ -63,8 +63,8 @@
                 document.querySelector('#channelTopic').innerHTML = channelData.topic.value.replace('\n', '<br>');;
                 document.querySelector('#channelPurpose').innerHTML = channelData.purpose.value.replace('\n', '<br>');    
 
-                applyWidgetJml('#members', membersWidgetJml, archiveData, channelData.members);
-                applyWidgetJml('#messages', channelMessagesJml, archiveData, messages);
+                applyWidgetJml('#members', membersWidgetJml, ARCHIVE_DATA, channelData.members);
+                applyWidgetJml('#messages', channelMessagesJml, ARCHIVE_DATA, messages);
             }
 
         </script>

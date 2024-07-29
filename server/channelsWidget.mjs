@@ -3,19 +3,19 @@ import { formatSlackDateFromTs } from './timestamps.mjs';
 import { formatUsernameFromId } from './users.mjs';
 
 export function channelsWidgetJml(data) {
-    const channelsArr = data.channelsArr;
-    const usersArr = data.usersArr;
+    const CHANNELS_ARR = data.CHANNELS_ARR;
+    const USERS_ARR = data.USERS_ARR;
 
     const channelNodes = [];
 
-    console.log('chanobj ', channelsArr);
-    for (const i of channelsArr) {
+    console.log('chanobj ', CHANNELS_ARR);
+    for (const i of CHANNELS_ARR) {
         if (!i.pins) {
             i.pins = [];
         }
         
         let createdStr = formatSlackDateFromTs(i.created);
-        let creatorStr = formatUsernameFromId(i.creator, usersArr);
+        let creatorStr = formatUsernameFromId(USERS_ARR, i.creator);
 
         let chan = jml('div', { class: 'channel'}, [
             jml('a', { href: `./channelPage.htm?id=${i.id}` },

@@ -2,11 +2,11 @@ import { jml } from './jml.mjs';
 import { prettyNameFromId } from './users.mjs';
 import { formatSlackTimeFromTs } from './timestamps.mjs';
 
-export function channelMessagesJml(archiveData, messages) {
+export function channelMessagesJml(ARCHIVE_DATA, messages) {
     let messageNodes = [];
 
     for (var ind = 0; ind < messages.length; ind++) {
-        let renderedMessage = renderMessage(ind, messages, archiveData.usersArr);
+        let renderedMessage = renderMessage(ARCHIVE_DATA.USERS_ARR, ind, messages);
         messageNodes.push(renderedMessage);
     }
 
@@ -15,7 +15,7 @@ export function channelMessagesJml(archiveData, messages) {
     return messageNodes;
 }
 
-export function renderMessage(ind, messages, USERS_ARR) {
+export function renderMessage(USERS_ARR, ind, messages) {
     let message = messages[ind];
     
     if (!message.type === 'message') { 
@@ -44,12 +44,12 @@ export function renderMessage(ind, messages, USERS_ARR) {
     const messageBodyNodes = [];
 
     if (user && !isSequel) {
-        let nametag = prettyNameFromId(user.id, USERS_ARR);
+        let nametag = prettyNameFromId(USERS_ARR, user.id);
         messageBodyNodes.push(jml('span', { class: 'message_user' }, nametag));
         messageBodyNodes.push(jml('br'));
     }
 
-    messageBodyNodes.push(renderMessageText(message, USERS_ARR));
+    messageBodyNodes.push(renderMessageText(USERS_ARR, message));
     
     if (message.files) {
         messageBodyNodes.push(jml('figure', { class: 'message_files' }, renderMessageFiles(message)));
@@ -66,7 +66,7 @@ export function renderMessage(ind, messages, USERS_ARR) {
     ])
 }
 
-function renderMessageText(message, USERS_ARR) {
+function renderMessageText(USERS_ARR, message) {
     if (message.blocks) {
         try {
             const blocks = [];
@@ -79,7 +79,7 @@ function renderMessageText(message, USERS_ARR) {
                 for (const element of block.elements) {
                     const subElements = [];
                     for (const subElement of element.elements) {
-                        let content = contentFromSubElement(subElement, USERS_ARR);
+                        let content = contentFromSubElement(USERS_ARR, subElement);
                         subElements.push(jml('span', { class: `block_subelement type_${subElement.type}` }, content));
                     }
                     elements.push(jml('span', { class: `block_element type_${element.type}` }, subElements));
@@ -98,7 +98,7 @@ function renderMessageText(message, USERS_ARR) {
     return jml('span', { class: 'message_content' }, message.text);
 }
 
-function contentFromSubElement(subElement, USERS_ARR) {
+function contentFromSubElement(USERS_ARR, subElement) {
     var content = '';
     switch (subElement.type) {
         case 'emoji':
@@ -114,24 +114,25 @@ function contentFromSubElement(subElement, USERS_ARR) {
             content = subElement.text;
             break;
         case 'user':
-            content = renderMention(subElement.user_id, USERS_ARR);
+            content = renderMention(USERS_ARR, subElement.user_id);
+            break;
         default:
-            console.log("DONT KNOW WHAT TO DO", subElement)
+            console.log("DONT KNOW WHAT TO DO", subElement);
     }
 
     return content;
 }
 
-function renderMention(userId, USERS_ARR) {
+function renderMention(USERS_ARR, userId) {
     return jml('a', 
         { href: `./userPage.htm?id=${userId}` },
-        '@' + prettyNameFromId(userId, USERS_ARR)); 
+        '@' + prettyNameFromId(USERS_ARR, userId)); 
 }
 
 function renderMessageFiles(message) { 
     if (!message.files) return;
 
-    console.log(message.files);
+    console.log('Message files:', message.files);
     // const result = [];
 
     // for (const file of message.files) {
