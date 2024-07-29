@@ -34,7 +34,7 @@
             import { formatUsernameFromId } from './users.mjs';
 
             import { applyWidgetJml } from './widgetJml.mjs';
-            import { membersWidgetJml } from './membersWidget.mjs';
+            import { usersWidgetJml } from './usersWidget.mjs';
             import { channelEntriesWidgetJml } from './channelEntriesWidget.mjs';
             
             let params = getURLParameters();
@@ -63,7 +63,7 @@
                 document.querySelector('#channelStats').innerHTML += '<br>Creator: ' + formatUsernameFromId(ARCHIVE_DATA.USERS_ARR, channelData.creator);
                 document.querySelector('#channelStats').innerHTML += '<br>Archived: ' + channelData.is_archived;
                 
-                applyWidgetJml('#members', membersWidgetJml, ARCHIVE_DATA, channelData.members);
+                applyWidgetJml('#members', usersWidgetJml, ARCHIVE_DATA, channelData.members);
                 applyWidgetJml('#channelEntries', channelEntriesWidgetJml, ARCHIVE_DATA, channelName);
             }
 

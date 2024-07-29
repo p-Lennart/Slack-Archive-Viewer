@@ -33,6 +33,7 @@
             import { loadData } from './loadData.mjs'
             
             import { applyWidgetJml } from './widgetJml.mjs';
+            import { usersWidgetJml } from './usersWidget.mjs';
             import { channelsWidgetJml } from './channelsWidget.mjs';
 
             const ARCHIVE_DATA = await loadData('./VIEWERDATA', 'VIEWERDATA_map.json'); 
@@ -42,6 +43,7 @@
                 document.tile = ARCHIVE_DATA.ARCHIVE_NAME;
                 document.querySelector('#heading').innerHTML = ARCHIVE_DATA.ARCHIVE_NAME;
 
+                applyWidgetJml('#members', usersWidgetJml, ARCHIVE_DATA, null);
                 applyWidgetJml('#channels', channelsWidgetJml, ARCHIVE_DATA, null);
             }
 
@@ -50,7 +52,8 @@
         <link rel="stylesheet" href="memberPane.css">
     </head>
     <body>
-        <h1 id = 'heading'></h1>
-        <div id = 'channels'></div>
+        <div id='members'></div>
+        <h1 id='heading'></h1>
+        <div id='channels'></div>
     </body>
 </html>

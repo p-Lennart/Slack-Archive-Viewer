@@ -31,7 +31,7 @@
             import { jml, jml_nester } from './jml.mjs';
             import { loadJSON, loadData } from './loadData.mjs';
             import { applyWidgetJml } from './widgetJml.mjs';
-            import { membersWidgetJml } from './membersWidget.mjs';
+            import { usersWidgetJml } from './usersWidget.mjs';
             import { channelMessagesJml } from './channelMessages.mjs';
 
             let params = getURLParameters();
@@ -63,7 +63,7 @@
                 document.querySelector('#channelTopic').innerHTML = channelData.topic.value.replace('\n', '<br>');;
                 document.querySelector('#channelPurpose').innerHTML = channelData.purpose.value.replace('\n', '<br>');    
 
-                applyWidgetJml('#members', membersWidgetJml, ARCHIVE_DATA, channelData.members);
+                applyWidgetJml('#members', usersWidgetJml, ARCHIVE_DATA, channelData.users);
                 applyWidgetJml('#messages', channelMessagesJml, ARCHIVE_DATA, messages);
             }
 

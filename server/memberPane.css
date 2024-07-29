@@ -32,6 +32,12 @@ div.user_text {
     margin-left: 5px;
     margin-right: 2px;
 }
+div.user_text a {
+    text-decoration: none;
+}
+div.user_text a h3 {
+    margin: 0px;
+}
 div.user_text > * {
     margin: 0px;
     margin-bottom: 4px;
