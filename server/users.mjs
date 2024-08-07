@@ -26,6 +26,13 @@ export function prettyNameFromUserObj(userObj) {
         return userObj['real_name'];
 }
 
+export function mentionJmlFromStr(USERS_ARR, mentionStr) {
+    if (!mentionStr.startsWith('<@') || !mentionStr.endsWith('>')) {
+        return console.error(`Invalid mention string: ${mentionStr}`);
+    }
+    return mentionJmlFromId(USERS_ARR, mentionStr.replace('<@', '').replace('>', ''));    
+}
+
 export function mentionJmlFromId(USERS_ARR, userId) {
     return jml('a', 
         { href: `./userPage.htm?id=${userId}` },

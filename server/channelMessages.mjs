@@ -1,5 +1,5 @@
 import { jml } from './jml.mjs';
-import { prettyNameFromId, mentionJmlFromId } from './users.mjs';
+import { prettyNameFromId, mentionJmlFromId, mentionJmlFromStr } from './users.mjs';
 import { formatSlackTimeFromTs } from './timestamps.mjs';
 
 export function channelMessagesJml(ARCHIVE_DATA, messages) {
@@ -9,8 +9,6 @@ export function channelMessagesJml(ARCHIVE_DATA, messages) {
         let renderedMessage = renderMessage(ARCHIVE_DATA.USERS_ARR, ind, messages);
         messageNodes.push(renderedMessage);
     }
-
-    console.log(messageNodes);
 
     return messageNodes;
 }
@@ -67,6 +65,12 @@ export function renderMessage(USERS_ARR, ind, messages) {
 }
 
 function renderMessageText(USERS_ARR, message) {
+    if (message.subtype) {
+        if (message.subtype === 'channel_join') {
+            return renderJoinText(USERS_ARR, message);
+        }
+    }
+
     if (message.blocks) {
         try {
             const blocks = [];
@@ -121,6 +125,16 @@ function contentFromSubElement(USERS_ARR, subElement) {
     }
 
     return content;
+}
+
+function renderJoinText(USERS_ARR, message) {
+    let splitPoint = message.text.indexOf('>') + 1;
+    let mentionJml = mentionJmlFromStr(USERS_ARR, message.text.slice(0, splitPoint));
+    let msgRemainder = message.text.slice(splitPoint);
+    return jml('span', { class: 'message_join' }, [
+        mentionJml,
+        msgRemainder
+    ]);
 }
 
 function renderMessageFiles(message) { 
