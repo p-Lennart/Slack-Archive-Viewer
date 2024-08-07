@@ -1,19 +1,22 @@
 import { jml } from './jml.mjs';
 import { prettyNameFromId, mentionJmlFromId, mentionJmlFromStr } from './users.mjs';
+import { messageFilesUI } from './channelMessageFiles.mjs';
 import { formatSlackTimeFromTs } from './timestamps.mjs';
 
 export function channelMessagesJml(ARCHIVE_DATA, messages) {
     let messageNodes = [];
 
     for (var ind = 0; ind < messages.length; ind++) {
-        let renderedMessage = renderMessage(ARCHIVE_DATA.USERS_ARR, ind, messages);
+        let renderedMessage = renderMessage(ARCHIVE_DATA, ind, messages);
         messageNodes.push(renderedMessage);
     }
 
     return messageNodes;
 }
 
-export function renderMessage(USERS_ARR, ind, messages) {
+export function renderMessage(ARCHIVE_DATA, ind, messages) {
+    let USERS_ARR = ARCHIVE_DATA.USERS_ARR;
+    
     let message = messages[ind];
     
     if (!message.type === 'message') { 
@@ -50,7 +53,7 @@ export function renderMessage(USERS_ARR, ind, messages) {
     messageBodyNodes.push(renderMessageText(USERS_ARR, message));
     
     if (message.files) {
-        messageBodyNodes.push(jml('figure', { class: 'message_files' }, renderMessageFiles(message)));
+        messageBodyNodes.push(jml('figure', { class: 'message_files' }, messageFilesUI(ARCHIVE_DATA, message)));
     }
     if (message.edited) {
         messageBodyNodes.push(jml('span', { class: 'message_editTag' }, '(edited)'));
@@ -135,27 +138,4 @@ function renderJoinText(USERS_ARR, message) {
         mentionJml,
         msgRemainder
     ]);
-}
-
-function renderMessageFiles(message) { 
-    if (!message.files) return;
-
-    console.log('Message files:', message.files);
-    // const result = [];
-
-    // for (const file of message.files) {
-    //     if (!file.permalink) {
-    //         console.log('File missing permalink', file);
-    //         continue;
-    //     }
-
-    //     // let filename = file.permalink.split('/').pop();
-    //     // var path = `../archives/${params.type}/${params.id}/files/${file.id}/${filename}`;
-
-    //     if (file.mimetype && file.mimetype.startsWith('image/')) {
-    //         result.push(jml('img', { src: path }));
-    //     }
-    // }
-
-    // return result;
 }

@@ -29,7 +29,7 @@
         </script>
         <script async type = "module">
             import { jml, jml_nester } from './jml.mjs';
-            import { loadJSON, loadData } from './loadData.mjs';
+            import { loadData, getChannelPath, getChannelMessages } from './loadData.mjs';
             import { applyWidgetJml } from './widgetJml.mjs';
             import { usersWidgetJml } from './usersWidget.mjs';
             import { channelMessagesJml } from './channelMessages.mjs';
@@ -43,18 +43,15 @@
                 throw new Error('Missing parameter "date"'); 
             }
 
-            const ARCHIVE_DATA = await loadData('./VIEWERDATA', 'VIEWERDATA_map.json'); 
+            const ARCHIVE_DATA = await loadData(); 
             
             const channelData = ARCHIVE_DATA.CHANNELS_ARR.find((c) => c.id === params.id);
             const channelName = channelData.name;
             const channelMap = ARCHIVE_DATA.ARCHIVE_MAP[channelName];
 
-            let channelPath = `./VIEWERDATA/${ARCHIVE_DATA.ARCHIVE_NAME}/${channelName}`;
-            console.log(channelPath);
+            const messages = await getChannelMessages(ARCHIVE_DATA, channelName, params.date);
 
-            const messages = await loadJSON(`${channelPath}/${params.date}.json`);
-
-            init(channelPath, params.date)
+            init(getChannelPath(ARCHIVE_DATA, channelName), params.date)
 
             async function init(path, date) {
                 setTitle('#' + channelName);

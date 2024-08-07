@@ -29,7 +29,7 @@
         </script>
         <script async type = "module">
             import { jml, jml_nester } from './jml.mjs';
-            import { loadData } from './loadData.mjs';
+            import { loadData, getChannelPath } from './loadData.mjs';
             import { formatSlackDateFromTs } from './timestamps.mjs'
             import { formatUsernameFromId } from './users.mjs';
 
@@ -43,13 +43,13 @@
                 throw new Error('Missing parameter "id"'); 
             }
             
-            const ARCHIVE_DATA = await loadData('./VIEWERDATA', 'VIEWERDATA_map.json'); 
+            const ARCHIVE_DATA = await loadData(); 
             
             const channelObj = ARCHIVE_DATA.CHANNELS_ARR.find((c) => c.id === params.id);
             const channelName = channelObj.name;
             const channelMap = ARCHIVE_DATA.ARCHIVE_MAP[channelName];
 
-            let channelPath = `./VIEWERDATA/${ARCHIVE_DATA.ARCHIVE_NAME}/${channelName}`;
+            let channelPath = getChannelPath(ARCHIVE_DATA, channelName);
             console.log(channelPath);
 
             init(channelPath);

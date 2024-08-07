@@ -36,7 +36,7 @@
             import { usersWidgetJml } from './usersWidget.mjs';
             import { channelsWidgetJml } from './channelsWidget.mjs';
 
-            const ARCHIVE_DATA = await loadData('./VIEWERDATA', 'VIEWERDATA_map.json'); 
+            const ARCHIVE_DATA = await loadData(); 
             init(ARCHIVE_DATA.CHANNELS_ARR);
 
             async function init(chansArr) {
