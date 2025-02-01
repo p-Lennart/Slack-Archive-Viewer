@@ -1,3 +1,6 @@
+/* build.mjs maps the VIEWERDATA directory using mapViewerData.mjs,
+and launches a viewing server that reads from the map data */
+
 import { writeFileSync } from 'fs';
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path';
@@ -14,10 +17,16 @@ const __dirname = dirname(__filename);
 const viewerPath = join(__dirname, './server')
 const viewerDataPath = join(viewerPath, './VIEWERDATA');
 
-let viewerDirMap = mapViewerData(viewerDataPath);
-writeMapJSON(viewerDirMap, viewerPath, './VIEWERDATA_map.json');
+init(process.argv[2] === 'launchOnly');
 
-launchViewingServer(8080, viewerPath, './index.htm');
+async function init(launchOnly) {
+    if (!launchOnly) {
+        let viewerDirMap = await mapViewerData(viewerDataPath, true);
+        writeMapJSON(viewerDirMap, viewerPath, './VIEWERDATA_map.json');
+    }
+
+    launchViewingServer(8080, viewerPath, './index.htm');
+}
 
 function writeMapJSON(mapObj, path, filename) {
     try {

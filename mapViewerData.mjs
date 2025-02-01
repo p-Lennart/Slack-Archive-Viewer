@@ -1,7 +1,13 @@
+/* mapViewerData.mjs reads the VIEWERDATA directory,
+checks if its contents are a valid archive, 
+creates a map of the archive files,
+and downloads any attatchments contained in messages */
+
 import fs from 'fs';
 import path from 'path';
+import { downloadFile } from './downloadFile.mjs'
 
-export function mapViewerData(rootPath) {
+export async function mapViewerData(rootPath, downloadFiles) {
     const rootMap = {};
     var rootEntries = [];
 
@@ -27,14 +33,14 @@ export function mapViewerData(rootPath) {
     }
 
     const archivePath = path.join(rootPath, archiveName);
-    rootMap[archiveName] = mapArchiveDir(archivePath);
+    rootMap[archiveName] = await mapArchiveDir(archivePath, downloadFiles);
     return rootMap;
 
 }
 
-function mapArchiveDir(archivePath) {
-    const archiveMap = {}
-    var archiveEntries = []
+async function mapArchiveDir(archivePath, downloadFiles) {
+    const archiveMap = {};
+    var archiveEntries = [];
 
     try {
         archiveEntries = fs.readdirSync(archivePath, { withFileTypes: true });
@@ -53,7 +59,11 @@ function mapArchiveDir(archivePath) {
                 throw new Error(`Archive directory ${archivePath} must contain only folders and JSON files, but contains file '${entryName}'`);
             }
         } else if (entry.isDirectory()) {
-            archiveMap[entryName] = mapChannelDir(entryPath);
+            if (entryName === 'VIEWERDATA_FILES') {
+                archiveMap[entryName] = await mapViewerDataFiles(entryPath);
+            } else {
+                archiveMap[entryName] = await mapChannelDir(entryPath, downloadFiles);
+            }
         }
     }
 
@@ -68,10 +78,50 @@ function mapArchiveDir(archivePath) {
     return archiveMap;
 }
 
-function mapChannelDir(channelPath) {
+async function mapViewerDataFiles(channelPath) {
+    const viewerDataFileMap = {}
+    var fileEntries = []
+    
+    try {
+        fileEntries = fs.readdirSync(channelPath, { withFileTypes: true });
+    } catch (err) {
+        throw new Error('Unable to scan files directory: ' + err);
+    }
+    
+    for (const entry of fileEntries) {
+        const entryName = entry.name;
+        
+        if (entry.isFile() || !entry.isDirectory()) {
+            throw new Error(`Channel directory ${channelPath} must contain only folders, but contains file '${entryName}'`);
+        }
+
+        try {
+            const entryContents = fs.readdirSync(path.join(channelPath, entryName), { withFileTypes: true });
+    
+            if (entryContents.length != 1) {
+                throw new Error(`File folder ${entryName} must have one file, but has multiple/no contents`);
+            }
+    
+            let containedFile = entryContents[0];
+            if (containedFile.isDirectory() || !containedFile.isFile()) {
+                throw new Error(`Content of file folder ${entryName} isn't a file: '${containedFile.name}'`);
+            }
+    
+            viewerDataFileMap[entryName] = containedFile.name;
+
+        } catch (err) {
+            throw new Error('Unable to scan file folder contents: ' + err);
+        }
+    }
+
+    return viewerDataFileMap;
+}
+
+
+async function mapChannelDir(channelPath, downloadFiles) {
     const channelMap = {}
     var channelEntries = []
-
+    
     try {
         channelEntries = fs.readdirSync(channelPath, { withFileTypes: true });
     } catch (err) {
@@ -89,8 +139,72 @@ function mapChannelDir(channelPath) {
 
         let messagesData = fs.readFileSync(path.join(channelPath, entryName));
         let messages = JSON.parse(messagesData);
-        channelMap[entryName] = messages.length;
+
+        channelMap[entryName] = await processMessages(channelPath, messages, entryName, downloadFiles);
     }
 
     return channelMap;
+}
+
+async function processMessages(channelPath, messages, messageGroupName, downloadFiles) {
+    const archivePath = path.dirname(channelPath);
+    const channelName = path.basename(channelPath);
+
+    const writtenFiles = {};
+    var count = 0;
+
+    for (let m of messages) {
+        if (m.files) {
+            var fileCount = 0;
+            for (let file of m.files) {
+                console.log(`${channelName} | ${messageGroupName} ${count+1}/${messages.length} | Downloading file ${fileCount+1}/${m.files.length}: ${file.name}`);
+                writtenFiles[file.id] = await processMessageFile(archivePath, channelName, file);
+                fileCount += 1;
+            }
+        }
+        count += 1;
+    }
+    
+    const messageEntry = {
+        count: count,
+    }
+
+    if (downloadFiles && Object.values(writtenFiles).length > 0) {
+        messageEntry.files = writtenFiles;
+    }
+    
+    return messageEntry;
+}
+
+async function processMessageFile(archivePath, channelName, file) {
+    let result = [];
+    let downloadUrls = [
+        file.url_private_download,
+    ];
+
+    file.VIEWERDATA = {
+        channel: channelName,
+        writtenPaths: [],
+    }
+
+    for (let url of downloadUrls) {
+        if (!url) {
+            console.log('Skipping missing url: ', url, file);
+            continue;
+        }
+
+        let sourceName = url.split('/').slice('-1')[0].split('?')[0];
+        let filePath = path.join(archivePath, 'VIEWERDATA_FILES', file.id);
+        let writtenName = await downloadFile(url, sourceName, filePath);
+
+        if (!writtenName) {
+            console.log('Failed downloading ', file);
+            continue;
+        }
+        
+        result.push(writtenName);
+        file['VIEWERDATA'].writtenPaths.push(filePath);
+    }
+
+    return result;
 }

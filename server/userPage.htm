@@ -1,0 +1,74 @@
+<!-- <!DOCTYPE html>
+<html>
+    <head>
+        <script src = 'urlParameters.js'></script>
+        <script>
+            function setTitle(str) {
+                document.title = `Slack | ${str}`;
+            }
+        
+            function setDisplay(ID, value) {
+                document.getElementById(ID).style.display = value;
+            }
+
+            function toggleCollapse(t) {
+                let contentID = t.id.split('Title').join('Content');
+                let titleMaxID = t.id + 'Max';
+                let titleMinID = t.id + 'Min';
+
+                if (document.getElementById(contentID).style.display === 'none') {
+                    setDisplay(contentID, 'block');
+                    setDisplay(titleMaxID, 'block');
+                    setDisplay(titleMinID, 'none');
+                } else {
+                    setDisplay(contentID, 'none');
+                    setDisplay(titleMaxID, 'none');
+                    setDisplay(titleMinID, 'block');
+                }
+            }
+        </script>
+        <script async type = "module">
+            import { jml, jml_nester } from './jml.mjs';
+            import { loadData, getChannelPath } from './loadData.mjs';
+            import { formatSlackDateFromTs } from './timestamps.mjs'
+            import { formatUsernameFromId } from './users.mjs';
+
+            import { applyWidgetJml } from './widgetJml.mjs';
+            import { usersWidgetJml } from './usersWidget.mjs';
+            
+            let params = getURLParameters();
+            if (!params.id) {
+                throw new Error('Missing parameter "id"'); 
+            }
+            
+            const ARCHIVE_DATA = await loadData(); 
+            
+            // const channelObj = ARCHIVE_DATA.CHANNELS_ARR.find((c) => c.id === params.id);
+            // const channelName = channelObj.name;
+            // const channelMap = ARCHIVE_DATA.ARCHIVE_MAP[channelName];
+
+            async function init(userID) {
+                setTitle('@' + userTag);
+                document.querySelector('#channelTitle').innerHTML = '@' + userTag;
+                // document.querySelector('#channelTopic').innerHTML = channelObj.topic.value.replace('\n', '<br>');;
+                // document.querySelector('#channelPurpose').innerHTML = channelObj.purpose.value.replace('\n', '<br>');    
+
+
+                // {"id":"U05ABEUNFTR","team_id":"T05BFMVCKMW","name":"p.e.29045","deleted":false,"color":"9f69e7","real_name":"Peter Edvardsson","tz":"America\/Los_Angeles","tz_label":"Pacific Daylight Time","tz_offset":-25200,"profile":{"title":"Slack King, piano hobbyist, classically illiterate","phone":"","skype":"","real_name":"Peter Edvardsson","real_name_normalized":"Peter Edvardsson","display_name":"birb","display_name_normalized":"birb","fields":{"Xf05AKD9D29L":{"value":"Slack King, piano hobbyist, classically illiterate","alt":""},"Xf05AS36K5MG":{"value":"F066SEJRA3Y","alt":""}},"status_text":"WHO ARE YOU I AM FROM ANCIENT GREECE","status_emoji":":vespian:","status_emoji_display_info":[{"emoji_name":"vespian","display_url":"https:\/\/emoji.slack-edge.com\/T05BFMVCKMW\/vespian\/665ccd0202efb222.png"}],"status_expiration":0,"avatar_hash":"4cc512addf40","image_original":"https:\/\/avatars.slack-edge.com\/2024-06-23\/7342133092512_4cc512addf40a81825a6_original.png","is_custom_image":true,"email":"p.e.29045@gmail.com","huddle_state":"default_unset","huddle_state_expiration_ts":0,"first_name":"Peter","last_name":"Edvardsson","image_24":"https:\/\/avatars.slack-edge.com\/2024-06-23\/7342133092512_4cc512addf40a81825a6_24.png","image_32":"https:\/\/avatars.slack-edge.com\/2024-06-23\/7342133092512_4cc512addf40a81825a6_32.png","image_48":"https:\/\/avatars.slack-edge.com\/2024-06-23\/7342133092512_4cc512addf40a81825a6_48.png","image_72":"https:\/\/avatars.slack-edge.com\/2024-06-23\/7342133092512_4cc512addf40a81825a6_72.png","image_192":"https:\/\/avatars.slack-edge.com\/2024-06-23\/7342133092512_4cc512addf40a81825a6_192.png","image_512":"https:\/\/avatars.slack-edge.com\/2024-06-23\/7342133092512_4cc512addf40a81825a6_512.png","image_1024":"https:\/\/avatars.slack-edge.com\/2024-06-23\/7342133092512_4cc512addf40a81825a6_1024.png","status_text_canonical":"","team":"T05BFMVCKMW"},"is_admin":true,"is_owner":true,"is_primary_owner":true,"is_restricted":false,"is_ultra_restricted":false,"is_bot":false,"is_app_user":false,"updated":1720830377,"is_email_confirmed":true,"who_can_share_contact_card":"EVERYONE"},
+
+
+                applyWidgetJml('#members', usersWidgetJml, ARCHIVE_DATA, channelObj.members);
+                // applyWidgetJml('#channelHeading', channelHeadingWidgetMjs, ARCHIVE_DATA, channelName);
+                // applyWidgetJml('#channelEntries', channelEntriesWidgetJml, ARCHIVE_DATA, channelName);
+            }
+
+        </script>
+        <link rel="stylesheet" href="main.css">
+        <link rel="stylesheet" href="memberPane.css">
+    </head>
+    <body>
+        <div id='members'></div>
+        <h1 id='userTitle'></h1>
+        <div id='userProfile'></div>
+    </body>
+</html> -->

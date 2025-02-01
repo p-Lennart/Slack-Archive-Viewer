@@ -6,12 +6,13 @@ export function channelEntriesWidgetJml(ARCHIVE_DATA, channelName) {
     const channelEntries = Object.keys(channelMap);
 
     const channelEntryNodes = [];
-
+    
     for (const e of channelEntries) {
+        let entryData = channelMap[e];
         let entryName = e.replace('.json', '');
         let entryNode = jml('li', { class: 'channelEntry'}, [
             jml('a', { href: `./channelViewer.htm?id=${channelObj.id}&date=${entryName}` }, entryName),
-            jml('span', {}, `: ${channelMap[e]} messages`),
+            jml('span', {}, `: ${entryData.count} messages`),
         ]);
 
         channelEntryNodes.push(entryNode);

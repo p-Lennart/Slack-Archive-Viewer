@@ -11,7 +11,7 @@ export function ARCHIVE_PATH(ARCHIVE_DATA) {
 }
 
 export function FILES_PATH(ARCHIVE_DATA) {
-    return ARCHIVE_PATH(ARCHIVE_DATA) + '/VIEWER_FILES';
+    return ARCHIVE_PATH(ARCHIVE_DATA) + '/VIEWERDATA_FILES';
 }
 
 export function CHANNELS_JSON_PATH(ARCHIVE_DATA) {
@@ -30,9 +30,18 @@ export async function getChannelMessages(ARCHIVE_DATA, channelName, messagesDate
     return await loadJSON(`${getChannelPath(ARCHIVE_DATA, channelName)}/${messagesDate}.json`);
 }
 
-export function localPathFromFile(ARCHIVE_DATA, file) {
-    let filename = file.permalink.split('/').pop();
-    return `${FILES_PATH(ARCHIVE_DATA)}/${file.id}/${filename}`;
+export function getFileLocalPath(ARCHIVE_DATA, file) {
+    let fileEntries = ARCHIVE_DATA.ARCHIVE_MAP.VIEWERDATA_FILES;
+    if (!file.id) {
+        return null;
+    }
+    let filename = fileEntries[file.id];
+    if (!filename) {
+        return null;
+    }
+
+    let result = `${FILES_PATH(ARCHIVE_DATA)}/${file.id}/${filename}`;
+    return result;
 }
 
 export async function loadJSON(path) {
